@@ -1,11 +1,14 @@
+import React, { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
 import Header from "./components/shared/Header";
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import Chat from "./pages/Chat";
 import { useAuth } from "./context/AuthContext";
 import styles from './App.module.css';
+
+
+const Home = lazy(() => import("./pages/Home"));
+const Login = lazy(() => import("./pages/Login"));
+const Signup = lazy(() => import("./pages/Signup"));
+const Chat = lazy(() => import("./pages/Chat"));
 
 function App() {
 	const auth = useAuth();
@@ -14,19 +17,21 @@ function App() {
 		<div>
 			<Header />
 			<main className={styles.routes}>
-				<Routes>
-					<Route path='/' element={<Home />} />
-					<Route path='/login' element={<Login />} />
-					<Route path='/signup' element={<Signup />} />
-					
-					{/* Protected Route */}
-					<Route
-						path='/chat'
-						element={
-							auth?.isLoggedIn ? <Chat /> : <Login />
-						}
-					/>
-				</Routes>
+	
+				<Suspense fallback={<div className="text-center p-4">Loading...</div>}>
+					<Routes>
+						<Route path='/' element={<Home />} />
+						<Route path='/login' element={<Login />} />
+						<Route path='/signup' element={<Signup />} />
+						
+						<Route
+							path='/chat'
+							element={
+								auth?.isLoggedIn ? <Chat /> : <Login />
+							}
+						/>
+					</Routes>
+				</Suspense>
 			</main>
 		</div>
 	);

@@ -12,7 +12,7 @@ import Button from "../components/shared/Button";
 import styles from "./AuthForm.module.css";
 import { useAuth } from "../context/AuthContext";
 
-// Axios defaults
+
 axios.defaults.baseURL = import.meta.env.REACT_APP_API_URL || "http://localhost:5000/api";
 axios.defaults.withCredentials = true;
 
