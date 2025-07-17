@@ -45,8 +45,8 @@ const userSignUp = async (req, res, next) => {
 			expires,
 			httpOnly: true,
 			signed: true,
-			secure: false,
-			sameSite: "lax",
+			secure: true,
+			sameSite: "None",
 		});
 
 		return res.status(201).json({ message: "OK", name: user.name, email: user.email });
@@ -94,8 +94,8 @@ const userLogin = async (req, res, next) => {
 			expires,
 			httpOnly: true,
 			signed: true,
-			secure: false, 
-			sameSite: "lax",
+			secure: true, 
+			sameSite: "None",
 		});
 
 		console.log("Login successful. Cookie set.");
