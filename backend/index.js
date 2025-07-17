@@ -19,7 +19,8 @@ const app = express();
 // Middlewares
 const allowedOrigins = [
   'http://localhost:5173',
-  'https://mern-gpt-delta.vercel.app', 
+  'https://mern-gpt-delta.vercel.app',
+  'https://mern-b4pp4mae6-oderoceasars-projects.vercel.app', 
 ];
 
 app.use(cors({
@@ -33,6 +34,7 @@ app.use(cors({
   },
   credentials: true,
 }));
+
 
 app.use(express.json());
 app.use(cookieParser(process.env.SESSION_SECRET));
