@@ -14,9 +14,9 @@
 
     Get syntax-highlighted code snippets
 
-## 🌐 Live URL (Optional)
+## 🌐 Live URL 
 
-    Add deployment link here if hosted
+    https://mern-gpt-delta.vercel.app/
 
 ## 🚀 Features
 
