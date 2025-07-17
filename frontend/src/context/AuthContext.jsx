@@ -1,60 +1,95 @@
 import axios from "axios";
-import { userLogin,	getAuthStatus, logoutUser, userSignup } from "../../services/api";
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  userLogin,
+  getAuthStatus,
+  logoutUser,
+  userSignup
+} from "../../services/api";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+  useMemo
+} from "react";
 
+// 1. Create the context
 const AuthContext = createContext(null);
 
+// 2. Provider Component
 export const AuthProvider = ({ children }) => {
-	const [user, setUser] = useState(null);
-	const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-	useEffect(() => {
-		const checkAuthStatus = async () => {
-			try {
-				console.log('Fetching auth status from:', axios.defaults.baseURL + '/user/auth-status');
-				const data = await getAuthStatus();
-				if (data) {
-					setUser({ email: data.email, name: data.name });
-					setIsLoggedIn(true);
-				}
-			} catch (err) {
-				console.error("Auth status check failed:", err.message);
-			}
-		};
-		checkAuthStatus();
-	}, []);
+  // Check if the user is already authenticated
+  useEffect(() => {
+    const fetchAuthStatus = async () => {
+      try {
+        console.log("Fetching auth status from:", axios.defaults.baseURL + "/user/auth-status");
+        const data = await getAuthStatus();
+        if (data?.email && data?.name) {
+          setUser({ email: data.email, name: data.name });
+          setIsLoggedIn(true);
+        }
+      } catch (error) {
+        console.error("Auth status check failed:", error.message);
+      }
+    };
 
-	const login = async (email, password) => {
-		const data = await userLogin(email, password);
-		if (data) {
+    fetchAuthStatus();
+  }, []);
 
-			// localStorage.setItem("token", data.token);
+  // Login Handler
+  const login = useCallback(async (email, password) => {
+    try {
+      const data = await userLogin(email, password);
+      if (data?.email && data?.name) {
+        setUser({ email: data.email, name: data.name });
+        setIsLoggedIn(true);
+      }
+    } catch (error) {
+      console.error("Login failed:", error.message);
+      throw error;
+    }
+  }, []);
 
-			setUser({ email: data.email, name: data.name });
-			setIsLoggedIn(true);
-		}
-	};
+  // Signup Handler
+  const signup = useCallback(async (name, email, password) => {
+    try {
+      await userSignup(name, email, password);
+    } catch (error) {
+      console.error("Signup failed:", error.message);
+      throw error;
+    }
+  }, []);
 
-	const signup = async (name, email, password) => {
-		await userSignup(name, email, password);
-	};
+  // Logout Handler
+  const logout = useCallback(async () => {
+    try {
+      await logoutUser();
+    } catch (error) {
+      console.error("Logout failed:", error.message);
+    } finally {
+      setUser(null);
+      setIsLoggedIn(false);
+    }
+  }, []);
 
-	const logout = async () => {
-		await logoutUser();
-		setIsLoggedIn(false);
-		setUser(null);
-		window.location.reload();
-	};
+  // Memoize context value to avoid unnecessary re-renders
+  const value = useMemo(
+    () => ({
+      user,
+      isLoggedIn,
+      login,
+      signup,
+      logout
+    }),
+    [user, isLoggedIn, login, signup, logout]
+  );
 
-	const value = {
-		user,
-		isLoggedIn,
-		login,
-		logout,
-		signup,
-	};
-
-	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
+// 3. Hook for consuming context
 export const useAuth = () => useContext(AuthContext);

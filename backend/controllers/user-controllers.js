@@ -59,49 +59,60 @@ const userSignUp = async (req, res, next) => {
 const userLogin = async (req, res, next) => {
 	try {
 		const { email, password } = req.body;
-		console.log(email, password);
+		console.log("Login attempt:", email);
 
 		const user = await User.findOne({ email });
-		if (!user)
-			return res.status(409).json({
-				message: "ERROR",
-				cause: "No account with given emailID found",
+		if (!user) {
+			console.warn("Login failed: No account found for", email);
+			return res.status(401).json({
+				message: "Invalid email or password",
 			});
+		}
 
 		const isPasswordCorrect = await compare(password, user.password);
-		if (!isPasswordCorrect)
-			return res.status(403).json({
-				message: "ERROR",
-				cause: "Incorrect Password",
+		if (!isPasswordCorrect) {
+			console.warn("Login failed: Incorrect password for", email);
+			return res.status(401).json({
+				message: "Invalid email or password",
 			});
+		}
 
+		// Clear existing cookie if any
 		res.clearCookie(COOKIE_NAME, {
 			path: "/",
 			httpOnly: true,
 			signed: true,
 		});
 
+		// Generate token
 		const token = createToken(user._id.toString(), user.email, "7d");
-		const expires = new Date();
-		expires.setDate(expires.getDate() + 7);
+		const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); 
 
+		// Set cookie
 		res.cookie(COOKIE_NAME, token, {
 			path: "/",
 			expires,
 			httpOnly: true,
 			signed: true,
-			secure: false,
+			secure: false, 
 			sameSite: "lax",
 		});
-		console.log("Cookie set!");
-		console.log("Res Headers: ", res.getHeaders());
 
-		return res.status(200).json({ message: "OK", name: user.name, email: user.email });
+		console.log("Login successful. Cookie set.");
+		return res.status(200).json({
+			message: "Login successful",
+			name: user.name,
+			email: user.email,
+		});
 	} catch (error) {
-		console.error(error);
-		return res.status(500).json({ message: "ERROR", cause: error.message });
+		console.error("Login error:", error.message);
+		return res.status(500).json({
+			message: "Internal Server Error",
+			error: error.message,
+		});
 	}
 };
+
 
 const verifyUserStatus = async (req, res, next) => {
 	try {

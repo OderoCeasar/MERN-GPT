@@ -12,7 +12,7 @@ const chatRoutes = require("./routes/chat-routes.js");
 const session = require("express-session");
 
 dotenv.config();
-// console.log("Loaded OpenAI key:", process.env.OPENAI_API_KEY);
+// console.log("Loaded OpenAI key:", process.env.OPENAI_API_KEY);clear
 
 const app = express();
 

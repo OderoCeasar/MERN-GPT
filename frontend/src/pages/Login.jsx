@@ -62,7 +62,7 @@ const Login = () => {
 						name='email'
 						type='text'
 						required={true}
-						maxLength={20}
+						maxLength={100}
 						minLength={5}
 						label='Email address'
 						onChange={() => {}}

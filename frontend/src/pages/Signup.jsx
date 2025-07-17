@@ -83,7 +83,7 @@ const Signup = () => {
 						name='email'
 						type='text'
 						required={true}
-						maxLength={50}
+						maxLength={100}
 						minLength={5}
 						label='Email address'
 						onChange={() => {}}

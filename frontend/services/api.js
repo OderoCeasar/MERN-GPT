@@ -14,7 +14,8 @@ export const userLogin = async (email, password) => {
     const response = await API.post("/user/login", { email, password });
     return response.data;
   } catch (err) {
-    throw new Error(`Error! Cannot Login. ${err.message}`);
+    const backendMessage = err?.response?.data?.message || err?.message || "Unknown error";
+    throw new Error(`Login failed: ${backendMessage}`);
   }
 };
 

@@ -17,7 +17,7 @@ const Section = (props) => {
 
 	const contentVariants = {
 		initial: {
-			x: "-70",
+			x: -70,
 			opacity: 0,
 			transition: {
 				duration: 1,
