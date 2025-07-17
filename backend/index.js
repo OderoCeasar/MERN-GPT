@@ -24,14 +24,16 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
+    console.log("Incoming request from origin:", origin);
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
     }
   },
   credentials: true,
 }));
+
 app.use(express.json());
 app.use(cookieParser(process.env.SESSION_SECRET));
 app.use(morgan("dev")); 
