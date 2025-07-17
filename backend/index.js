@@ -24,9 +24,12 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser(process.env.SESSION_SECRET));
 app.use(morgan("dev")); 
-app.use(session({ secret: process.env.SESSION_SECRET }));
 
-
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'super-secret',
+  resave: false,
+  saveUninitialized: false,
+}));
 
 // Routes
 app.use("/api/user/", userRoutes);
@@ -34,9 +37,6 @@ app.use("/api/chat/", chatRoutes);
 
 // Connections and Listeners
 mongoose
-	// .connect(
-	// 	`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@new-cluster.syllbdh.mongodb.net/ai-chat-bot`
-	// )
     .connect(process.env.MONGO_URI)
 	.then(() => {
 		const PORT = process.env.PORT || 5000;
